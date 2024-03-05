@@ -1,25 +1,14 @@
 const loginForm = document.querySelector("#login_form")
-const usernameField = document.querySelector("#username")
-const passwordField = document.querySelector("#password")
+const usernameField = document.querySelector("#l-username")
+const passwordField = document.querySelector("#l-password")
+const noAccountWarning = document.querySelector("#no-account-warning")
 const BASE_URL = 'http://localhost:8000'
-
-async function postData(url, data) {
-    try {
-        const response = await fetch(url, {
-            method: 'POST',
-            body: data
-        })
-        return response.json()
-    } catch(err) {
-        console.log(err)
-    }
-}
 
 loginForm.addEventListener("submit", async (e) => {
     e.preventDefault()
 
     const {value: username} = usernameField
-    const {value: password} = passwordField 
+    const {value: password} = passwordField
 
     try {
         const response = await fetch(`${BASE_URL}/login`, {
@@ -30,11 +19,16 @@ loginForm.addEventListener("submit", async (e) => {
                 'Content-Type': 'application/json'
             },
         })
-        console.log(response.json())
+        if (response.status === 400) {
+            noAccountWarning.classList.remove('hide')
+            noAccountWarning.classList.add('visible')
+        } else if (response.status === 500){
+            console.log(500)
+        } else if (response.ok) {
+            console.log('Logging...')
+            // TODO: redirect to main page
+        }
     } catch(err) {
         console.log(err)
     }
-
-    usernameField.value = ''
-    passwordField.value = ''
 })

@@ -21,7 +21,6 @@
 6. Run `uvicorn main:app --reload` to run the project
 
 ## How to run
-1.
-2. Run `pip install requirements.txt`
-3. Run `uvicorn main:app --reload` to run the project
-
+1. 
+2. To install all packages, run `pip install requirements.txt`
+3. To run the server, run `uvicorn main:app --reload` to run the project

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+    <h1>Register Page</h1>
+    <form id="register_form">
+        <div>
+            Username<span class="red-text">*</span> :
+            <input name="username" id="r-username" required />
+        </div>
+        <div>
+            Password<span class="red-text">*</span> :
+            <input type="password" id="r-password" name="password" required/>
+        </div>
+        <div>
+            Confirmed Password<span class="red-text">*</span> :
+            <input type="password" id="r-cPassword" name="confirmedPassword" required/>
+            <span id="password-warning" style="color: red;" class="hide">Password Must Match!</span>
+        </div>
+        <button type="submit">Register</button>
+    </form>
+    <span id="got-account-warning" class="hide"><i>Account Already Existed. Login <a href="/login">here</a></i></span>
+    <script src="static/js/register.js"></script>
+</body>
+</html>

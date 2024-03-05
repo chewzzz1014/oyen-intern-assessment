@@ -1,0 +1,9 @@
+.visible {
+    display: block;
+}
+.hide {
+    display: none;
+}
+.red-text {
+    color: red;
+}

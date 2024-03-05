@@ -4,16 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    <link rel="stylesheet" href="static/css/style.css">
 </head>
 <body>
     <h1>Login Page</h1>
     <form id="login_form">
-        Username: <input name="username" id="username" required />
-        <br />
-        Password: <input type="password" id="password" name="password" required/>
-        <br />
+        <div>
+            Username<span class="red-text">*</span> :
+            <input name="username" id="l-username" required />
+        </div>
+        <div>
+            Password<span class="red-text">*</span> :
+            <input type="password" id="l-password" name="password" required/>
+        </div>
         <button type="submit">Login</button>
     </form>
+    <span id="no-account-warning" class="hide"><i>Account Does Not Exist. Register <a href="/register">here</a></i></span>
     <script src="static/js/login.js"></script>
 </body>
 </html>
