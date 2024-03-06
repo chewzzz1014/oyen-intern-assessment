@@ -21,6 +21,9 @@
 6. Run `uvicorn main:app --reload` to run the project
 
 ## How to run
-1. 
-2. To install all packages, run `pip install requirements.txt`
-3. To run the server, run `uvicorn main:app --reload` to run the project
+1. Clone this repository. Make sure that Python and virtual environment are installed on your desktop.
+2. (Optional) Create a virtual environment and active it by running
+    `python -m venv venv`
+    `.\\venv\Scripts\activate`
+3. To install all packages, run `pip install -r requirements.txt`
+4. To run the server, run `uvicorn main:app --reload`

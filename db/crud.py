@@ -7,9 +7,8 @@ def get_user_by_username(db: Session, username: str):
 
 # TODO: check password matched. hash password
 
-def create_user(db: Session, user: schemas.UserCreateSchema):
-    hashed_password = 'fakehashed' + user.password
-    created_user = models.User(username=user.username, hashed_password=hashed_password)
+def create_user(db: Session, user: schemas.UserCreateSchema, hashed_password):
+    created_user = models.User(username=user.username, password=hashed_password)
     db.add(created_user)
     db.commit()
     db.refresh(created_user)
