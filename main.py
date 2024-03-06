@@ -2,7 +2,6 @@ from fastapi import FastAPI, Depends, HTTPException, Cookie
 from fastapi.responses import FileResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from typing import Annotated
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 # db
 from sqlalchemy.orm import Session
 from utils import get_db
@@ -14,7 +13,7 @@ from db.database import engine, Base
 from auth.models import Token
 from datetime import timedelta
 from auth.token import ACCESS_TOKEN_EXPIRE_MINUTES
-from auth.auth import get_current_active_user
+from auth.auth import get_current_active_user, get_current_user
 from auth.token import get_hashed_password, verify_password, create_access_token
 
 
@@ -53,7 +52,7 @@ async def login_post(user: UserCreateSchema, db: Session = Depends(get_db)):
     )
     content = {"access_token": access_token, "token_type": "bearer"}
     response = Response(content=content)
-    response.set_cookie(key="session", value='bearer ' + access_token, samesite='lax')
+    response.set_cookie(key="session", value=access_token, samesite='lax')
     return response
 
 
@@ -75,13 +74,15 @@ async def register_post(user: UserCreateSchema, db: Session = Depends(get_db)):
     )
     content = {"access_token": access_token, "token_type": "bearer"}
     response = Response(content=content)
-    response.set_cookie(key="session", value='bearer ' + access_token, samesite='lax')
+    response.set_cookie(key="session", value=access_token, samesite='lax')
     return response
 
 @app.get("/{any_path:path}")
-async def root_get(any_path: str, session : Annotated[str | None, Cookie()]=None):
+async def handle_all_path(any_path: str, session : Annotated[str | None, Cookie()]=None):
     if session is None:
         return RedirectResponse('/login')
-    return any_path
+    # user = await get_current_user(session)
+    return FileResponse("static/template.html")
+
 
 # TODO: for all endpoints, display username, current path and logout btn
