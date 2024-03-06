@@ -1,5 +1,5 @@
-from fastapi import FastAPI, Depends, HTTPException
-from fastapi.responses import FileResponse, RedirectResponse, ORJSONResponse
+from fastapi import FastAPI, Depends, HTTPException, Cookie
+from fastapi.responses import FileResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from typing import Annotated
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -16,44 +16,27 @@ from datetime import timedelta
 from auth.token import ACCESS_TOKEN_EXPIRE_MINUTES
 from auth.auth import get_current_active_user
 from auth.token import get_hashed_password, verify_password, create_access_token
-from requests.exceptions import HTTPError
 
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static", html=True), name="static")
 
+# create db
 Base.metadata.create_all(bind=engine)
 
-async def check_user(current_user = Depends(get_current_active_user)):
-    try:
-        print(current_user)
-        return current_user
-    except Exception as err:
-        print('1111')
-        print(err)
-    
 
 @app.get("/")
-async def root_get(current_user = Depends(check_user)):
-    # TODO: check whether user is login, if yes to main page else to login
-    # return RedirectResponse("/home")
-    print(current_user.username)
-    return "hello"
-
-@app.post("/")
-async def root_post(current_user = Depends(check_user)):
-    # TODO: check whether user is login, if yes to main page else to login
-    # return RedirectResponse("/home")
+async def root_get(session : Annotated[str | None, Cookie()]=None):
+    if session is None:
+        return RedirectResponse('/login')
     return FileResponse("static/home.html")
 
-
-
-
-
 @app.get("/login")
-async def login_get():
-    # TODO: check whether user is login, if yes redirect to main page else to login
+async def login_get(session : Annotated[str | None, Cookie()]=None):
+    if session is not None:
+        return RedirectResponse('/')
     return FileResponse("static/login.html")
+
 
 @app.post("/login")
 async def login_post(user: UserCreateSchema, db: Session = Depends(get_db)):
@@ -69,17 +52,19 @@ async def login_post(user: UserCreateSchema, db: Session = Depends(get_db)):
         data={"sub": user.username}, expires_delta=access_token_expires
     )
     content = {"access_token": access_token, "token_type": "bearer"}
-    return ORJSONResponse([content])
+    response = Response(content=content)
+    response.set_cookie(key="session", value='bearer ' + access_token, samesite='lax')
+    return response
 
 
 @app.get("/register")
-async def register_get():
-    # TODO: check whether user is login, if yes redirect to main page else to register
+async def register_get(session : Annotated[str | None, Cookie()]=None):
+    if session is not None:
+        return RedirectResponse('/')
     return FileResponse("static/register.html")
 
 @app.post("/register", response_model=UserSchema)
 async def register_post(user: UserCreateSchema, db: Session = Depends(get_db)):
-    print(user)
     found_user = get_user_by_username(db, username=user.username)
     if found_user:
         raise HTTPException(status_code=400, detail="Account Already Registered")
@@ -89,7 +74,14 @@ async def register_post(user: UserCreateSchema, db: Session = Depends(get_db)):
         data={"sub": user.username}, expires_delta=access_token_expires
     )
     content = {"access_token": access_token, "token_type": "bearer"}
-    return ORJSONResponse([content])
+    response = Response(content=content)
+    response.set_cookie(key="session", value='bearer ' + access_token, samesite='lax')
+    return response
 
+@app.get("/{any_path:path}")
+async def root_get(any_path: str, session : Annotated[str | None, Cookie()]=None):
+    if session is None:
+        return RedirectResponse('/login')
+    return any_path
 
 # TODO: for all endpoints, display username, current path and logout btn

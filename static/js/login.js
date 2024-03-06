@@ -5,8 +5,6 @@ const noAccountWarning = document.querySelector("#no-account-warning")
 const wrongPasswordWarning = document.querySelector("#wrong-warning")
 const BASE_URL = 'http://localhost:8000'
 
-const {access_token = '', token_type = ''} = JSON.parse(localStorage.getItem('token')) || {}
-
 loginForm.addEventListener("submit", async (e) => {
     e.preventDefault()
 
@@ -33,22 +31,9 @@ loginForm.addEventListener("submit", async (e) => {
             console.log(500)
         } else if (response.ok) {
             console.log('Logging...')
-            const data = await response.json()
-            const {access_token, token_type} = data[0]
-            if (access_token && token_type) {
-                localStorage.setItem('token', JSON.stringify({
-                    access_token, token_type
-                }))
-            }
+            
             // TODO: any better approach?
-            // location.href = `${BASE_URL}`
-            await fetch(`${BASE_URL}`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `${token_type} ${access_token}`
-                },
-            })
-            console.log('done redirect')
+            location.href = `${BASE_URL}`
         }
     } catch(err) {
         console.log('errr')

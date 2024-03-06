@@ -6,8 +6,6 @@ const passwordWarning = document.querySelector("#password-warning")
 const gotAccountWarning = document.querySelector("#got-account-warning")
 const BASE_URL = 'http://localhost:8000'
 
-const {access_token = '', token_type = ''} = JSON.parse(localStorage.getItem('token')) || {}
-
 const unmatchedPasswords = () => {
     return (passwordField.value && !confirmedPasswordField.value) || (passwordField.value !== confirmedPasswordField.value)
 }
@@ -47,13 +45,7 @@ registerForm.addEventListener("submit", async (e) => {
             console.log(500)
         } else if (response.ok) {
             console.log('Registering...')
-            const data = await response.json()
-            const {access_token, token_type} = data[0]
-            if (access_token && token_type) {
-                localStorage.setItem('token', JSON.stringify({
-                    access_token, token_type
-                }))
-            }
+
             // TODO: any better approach?
             location.href = `${BASE_URL}`
         }
