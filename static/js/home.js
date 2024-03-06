@@ -5,7 +5,7 @@ logoutBtn.addEventListener('click', async (e) => {
     e.preventDefault()
 
     try {
-        document.cookie = ''
+        document.cookie = 'login_session' + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
         console.log('Logging out...')
 
         // TODO: any better approach?

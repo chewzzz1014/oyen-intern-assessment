@@ -17,7 +17,7 @@ loginForm.addEventListener("submit", async (e) => {
             body: JSON.stringify({username, password}),
             headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/json'.
+                'Content-Type': 'application/json',
             },
         })
         if (response.status === 404) {

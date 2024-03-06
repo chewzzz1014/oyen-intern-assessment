@@ -1,20 +1,19 @@
 from fastapi import FastAPI, Depends, HTTPException, Cookie
-from fastapi.responses import FileResponse, RedirectResponse, Response
+from fastapi.responses import FileResponse, RedirectResponse, Response, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from typing import Annotated
+from utils import generate_template
 # db
 from sqlalchemy.orm import Session
 from utils import get_db
 from db.crud import create_user, get_user_by_username
-from db.models import User
 from db.schemas import UserCreateSchema, UserSchema
 from db.database import engine, Base
 # auth
-from auth.models import Token
 from datetime import timedelta
 from auth.token import ACCESS_TOKEN_EXPIRE_MINUTES
-from auth.auth import get_current_active_user, get_current_user
 from auth.token import get_hashed_password, verify_password, create_access_token
+from auth.auth import get_current_user
 
 
 app = FastAPI()
@@ -24,22 +23,22 @@ app.mount("/static", StaticFiles(directory="static", html=True), name="static")
 Base.metadata.create_all(bind=engine)
 
 
-@app.get("/")
-async def root_get(session : Annotated[str | None, Cookie()]=None):
-    if session is None:
+@app.get("/", response_class=HTMLResponse)
+async def root_get(login_session : Annotated[str | None, Cookie()]=None, db: Session = Depends(get_db)):
+    if login_session is None:
         return RedirectResponse('/login')
-    return FileResponse("static/home.html")
+    user = await get_current_user(login_session, db)
+    return generate_template('static/home.html', {'user': user.username})
 
 @app.get("/login")
-async def login_get(session : Annotated[str | None, Cookie()]=None):
-    if session is not None:
+async def login_get(login_session : Annotated[str | None, Cookie()]=None):
+    if login_session is not None:
         return RedirectResponse('/')
     return FileResponse("static/login.html")
 
 
 @app.post("/login")
 async def login_post(user: UserCreateSchema, db: Session = Depends(get_db)):
-    print(user)
     found_user = get_user_by_username(db, username=user.username)
     if not found_user:
         raise HTTPException(status_code=404, detail="Account Not Exist")
@@ -50,17 +49,17 @@ async def login_post(user: UserCreateSchema, db: Session = Depends(get_db)):
     access_token = create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
-    content = {"access_token": access_token, "token_type": "bearer"}
-    response = Response(content=content)
-    response.set_cookie(key="session", value=access_token, samesite='lax')
+    response = Response()
+    response.set_cookie(key="login_session", value=access_token, expires=ACCESS_TOKEN_EXPIRE_MINUTES*60, samesite='lax')
     return response
 
 
 @app.get("/register")
-async def register_get(session : Annotated[str | None, Cookie()]=None):
-    if session is not None:
+async def register_get(login_session : Annotated[str | None, Cookie()]=None):
+    if login_session is not None:
         return RedirectResponse('/')
     return FileResponse("static/register.html")
+
 
 @app.post("/register", response_model=UserSchema)
 async def register_post(user: UserCreateSchema, db: Session = Depends(get_db)):
@@ -72,17 +71,14 @@ async def register_post(user: UserCreateSchema, db: Session = Depends(get_db)):
     access_token = create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
-    content = {"access_token": access_token, "token_type": "bearer"}
-    response = Response(content=content)
-    response.set_cookie(key="session", value=access_token, samesite='lax')
+    response = Response()
+    response.set_cookie(key="login_session", value=access_token, expires=ACCESS_TOKEN_EXPIRE_MINUTES*60, samesite='lax')
     return response
 
-@app.get("/{any_path:path}")
-async def handle_all_path(any_path: str, session : Annotated[str | None, Cookie()]=None):
-    if session is None:
+
+@app.get("/{any_path}", response_class=HTMLResponse)
+async def handle_all_path(any_path: str, login_session : Annotated[str | None, Cookie()]=None, db: Session = Depends(get_db)):
+    if login_session is None:
         return RedirectResponse('/login')
-    # user = await get_current_user(session)
-    return FileResponse("static/template.html")
-
-
-# TODO: for all endpoints, display username, current path and logout btn
+    user = await get_current_user(login_session, db)
+    return generate_template('static/template.html', {'user': user.username, 'path': any_path})
