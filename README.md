@@ -19,8 +19,6 @@ For Oyen's Software Engineering Intern Assessment, a simple login system with fr
 
 ## How to run
 1. Clone this repository. Make sure that Python and virtual environment are installed on your desktop.
-2. (Optional) Create a virtual environment and active it by running
-    `python -m venv venv`
-    `.\\venv\Scripts\activate` (on Windows's cmd) or `source venv/bin/activate` (Mac or Linux)
+2. (Optional) Create a virtual environment and active it by running `python -m venv venv` follows by `.\\venv\Scripts\activate` (on Windows's cmd) or `source venv/bin/activate` (Mac or Linux)
 3. To install all packages, run `pip install -r requirements.txt`
 4. To run the server, run `uvicorn main:app`
