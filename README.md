@@ -1,8 +1,14 @@
 ## Introduction
 For Oyen's Software Engineering Intern Assessment, a simple login system with frontend and backend. User must register an account and login to access any path (including /). The JWT token is stored on cookie and is expired after 30 minutes. This project contains:
+
+
 - Login Page
 - Register Page
 - Other Pages (Display current path and current login user's username)
+
+![image](https://github.com/chewzzz1014/oyen-intern-assessment/assets/92832451/61d8cc7a-a4c5-43d8-9fad-6a4a463eaed9)
+![image](https://github.com/chewzzz1014/oyen-intern-assessment/assets/92832451/a5d45543-4964-4867-8930-efc300ffe654)
+![image](https://github.com/chewzzz1014/oyen-intern-assessment/assets/92832451/1fe02059-e9a8-4d7a-9b3b-34d0d8f25136)
 
 
 ## Setup
